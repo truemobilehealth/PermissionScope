@@ -27,11 +27,6 @@ import Accounts
 
 @objc public class NotificationsPermission: NSObject, Permission {
     public let type: PermissionType = .notifications
-    public let notificationCategories: Set<UIUserNotificationCategory>?
-    
-    public init(notificationCategories: Set<UIUserNotificationCategory>? = nil) {
-        self.notificationCategories = notificationCategories
-    }
 }
 
 @objc public class LocationWhileInUsePermission: NSObject, Permission {
