@@ -1087,7 +1087,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
      Hides the modal viewcontroller with an animation.
      */
     public func hide() {
-        let window = UIApplication.shared.keyWindow!
+        guard let window = UIApplication.shared.keyWindow else { return }
         
         DispatchQueue.main.async(execute: {
             UIView.animate(withDuration: 0.2, animations: {
