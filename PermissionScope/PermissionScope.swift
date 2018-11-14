@@ -199,6 +199,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
         
         // close button
         closeButton.setTitle("Close".localized, for: .normal)
+        closeButton.sizeToFit()
         closeButton.addTarget(self, action: #selector(cancel), for: .touchUpInside)
         closeButton.accessibilityIdentifier = "permissionscope.closeButton"
         
