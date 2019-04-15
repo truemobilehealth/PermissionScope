@@ -1016,20 +1016,27 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
         onAuthChange = authChange
         onCancel = cancelled
         
+        showWhenReady()
+    }
+    
+    private func showWhenReady() {
         DispatchQueue.main.async {
-            while self.waitingForBluetooth || self.waitingForMotion || self.waitingForNotification { }
-            // call other methods that need to wait before show
-            // no missing required perms? callback and do nothing
-            self.requiredAuthorized({ areAuthorized in
-                if areAuthorized {
-                    self.getResultsForConfig({ results in
-                        
-                        self.onAuthChange?(true, results)
-                    })
-                } else {
-                    self.showAlert()
-                }
-            })
+            if self.waitingForBluetooth || self.waitingForMotion || self.waitingForNotification {
+                self.showWhenReady()
+            } else {
+                // call other methods that need to wait before show
+                // no missing required perms? callback and do nothing
+                self.requiredAuthorized({ areAuthorized in
+                    if areAuthorized {
+                        self.getResultsForConfig({ results in
+                            
+                            self.onAuthChange?(true, results)
+                        })
+                    } else {
+                        self.showAlert()
+                    }
+                })
+            }
         }
     }
     
