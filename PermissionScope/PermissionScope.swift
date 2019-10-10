@@ -12,7 +12,7 @@ import AddressBook
 import AVFoundation
 import Photos
 import EventKit
-import CoreBluetooth
+//import CoreBluetooth
 import CoreMotion
 import Contacts
 import UserNotifications
@@ -22,8 +22,9 @@ public typealias authClosureType      = (_ finished: Bool, _ results: [Permissio
 public typealias cancelClosureType    = (_ results: [PermissionResult]) -> Void
 typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
 
-@objc public class PermissionScope: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDelegate, CBPeripheralManagerDelegate {
-    
+//@objc public class PermissionScope: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDelegate, CBPeripheralManagerDelegate {
+@objc public class PermissionScope: UIViewController, CLLocationManagerDelegate, UIGestureRecognizerDelegate {
+
     // MARK: UI Parameters
     
     /// Header UILabel with the message "Hey, listen!" by default.
@@ -67,10 +68,10 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
         lm.delegate = self
         return lm
     }()
-    
-    lazy var bluetoothManager:CBPeripheralManager = {
-        return CBPeripheralManager(delegate: self, queue: nil, options:[CBPeripheralManagerOptionShowPowerAlertKey: false])
-    }()
+
+//    lazy var bluetoothManager:CBPeripheralManager = {
+//        return CBPeripheralManager(delegate: self, queue: nil, options:[CBPeripheralManagerOptionShowPowerAlertKey: false])
+//    }()
     
     lazy var motionManager:CMMotionActivityManager = {
         return CMMotionActivityManager()
@@ -313,9 +314,13 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
         configuredPermissions.append(permission)
         permissionMessages[permission.type] = message
         
-        if permission.type == .bluetooth && askedBluetooth {
-            triggerBluetoothStatusUpdate()
-        } else if permission.type == .motion && askedMotion {
+//        if permission.type == .bluetooth && askedBluetooth {
+//            triggerBluetoothStatusUpdate()
+//        } else if permission.type == .motion && askedMotion {
+//            triggerMotionStatusUpdate()
+//        }
+        
+        if permission.type == .motion && askedMotion {
             triggerMotionStatusUpdate()
         } else if permission.type == .notifications && askedNotifications {
             triggerNotificationStatusUpdate()
@@ -856,79 +861,79 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
         }
     }
     
-    // MARK: Bluetooth
-    
-    /// Returns whether Bluetooth access was asked before or not.
-    fileprivate var askedBluetooth:Bool {
-        get {
-            return defaults.bool(forKey: Constants.NSUserDefaultsKeys.requestedBluetooth)
-        }
-        set {
-            defaults.set(newValue, forKey: Constants.NSUserDefaultsKeys.requestedBluetooth)
-            defaults.synchronize()
-        }
-    }
-    
-    /// Returns whether PermissionScope is waiting for the user to enable/disable bluetooth access or not.
-    fileprivate var waitingForBluetooth = false
-    
-    /**
-     Returns the current permission status for accessing Bluetooth.
-     
-     - returns: Permission status for the requested type.
-     */
-    public func statusBluetooth() -> PermissionStatus {
-        // if already asked for bluetooth before, do a request to get status, else wait for user to request
-        if askedBluetooth{
-            triggerBluetoothStatusUpdate()
-        } else {
-            return .unknown
-        }
-        
-        let state = (bluetoothManager.state, CBPeripheralManager.authorizationStatus())
-        switch state {
-        case (.unsupported, _), (.poweredOff, _), (_, .restricted):
-            return .disabled
-        case (.unauthorized, _), (_, .denied):
-            return .unauthorized
-        case (.poweredOn, .authorized):
-            return .authorized
-        default:
-            return .unknown
-        }
-        
-    }
-    
-    /**
-     Requests access to Bluetooth, if necessary.
-     */
-    @objc public func requestBluetooth() {
-        let status = statusBluetooth()
-        switch status {
-        case .disabled:
-            showDisabledAlert(.bluetooth)
-        case .unauthorized:
-            showDeniedAlert(.bluetooth)
-        case .unknown:
-            triggerBluetoothStatusUpdate()
-        default:
-            break
-        }
-        
-    }
-    
-    /**
-     Start and immediately stop bluetooth advertising to trigger
-     its permission dialog.
-     */
-    fileprivate func triggerBluetoothStatusUpdate() {
-        if !waitingForBluetooth && bluetoothManager.state == .unknown {
-            bluetoothManager.startAdvertising(nil)
-            bluetoothManager.stopAdvertising()
-            askedBluetooth = true
-            waitingForBluetooth = true
-        }
-    }
+//    // MARK: Bluetooth
+//
+//    /// Returns whether Bluetooth access was asked before or not.
+//    fileprivate var askedBluetooth:Bool {
+//        get {
+//            return defaults.bool(forKey: Constants.NSUserDefaultsKeys.requestedBluetooth)
+//        }
+//        set {
+//            defaults.set(newValue, forKey: Constants.NSUserDefaultsKeys.requestedBluetooth)
+//            defaults.synchronize()
+//        }
+//    }
+//
+//    /// Returns whether PermissionScope is waiting for the user to enable/disable bluetooth access or not.
+//    fileprivate var waitingForBluetooth = false
+//
+//    /**
+//     Returns the current permission status for accessing Bluetooth.
+//
+//     - returns: Permission status for the requested type.
+//     */
+//    public func statusBluetooth() -> PermissionStatus {
+//        // if already asked for bluetooth before, do a request to get status, else wait for user to request
+//        if askedBluetooth{
+//            triggerBluetoothStatusUpdate()
+//        } else {
+//            return .unknown
+//        }
+//
+//        let state = (bluetoothManager.state, CBPeripheralManager.authorizationStatus())
+//        switch state {
+//        case (.unsupported, _), (.poweredOff, _), (_, .restricted):
+//            return .disabled
+//        case (.unauthorized, _), (_, .denied):
+//            return .unauthorized
+//        case (.poweredOn, .authorized):
+//            return .authorized
+//        default:
+//            return .unknown
+//        }
+//
+//    }
+//
+//    /**
+//     Requests access to Bluetooth, if necessary.
+//     */
+//    @objc public func requestBluetooth() {
+//        let status = statusBluetooth()
+//        switch status {
+//        case .disabled:
+//            showDisabledAlert(.bluetooth)
+//        case .unauthorized:
+//            showDeniedAlert(.bluetooth)
+//        case .unknown:
+//            triggerBluetoothStatusUpdate()
+//        default:
+//            break
+//        }
+//
+//    }
+//
+//    /**
+//     Start and immediately stop bluetooth advertising to trigger
+//     its permission dialog.
+//     */
+//    fileprivate func triggerBluetoothStatusUpdate() {
+//        if !waitingForBluetooth && bluetoothManager.state == .unknown {
+//            bluetoothManager.startAdvertising(nil)
+//            bluetoothManager.stopAdvertising()
+//            askedBluetooth = true
+//            waitingForBluetooth = true
+//        }
+//    }
     
     // MARK: Core Motion Activity
     
@@ -988,7 +993,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
         waitingForMotion = true
     }
     
-    /// Returns whether Bluetooth access was asked before or not.
+    /// Returns whether Motion access was asked before or not.
     fileprivate var askedMotion:Bool {
         get {
             return defaults.bool(forKey: Constants.NSUserDefaultsKeys.requestedMotion)
@@ -1021,7 +1026,8 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     
     private func showWhenReady() {
         DispatchQueue.main.async {
-            if self.waitingForBluetooth || self.waitingForMotion || self.waitingForNotification {
+//            if self.waitingForBluetooth || self.waitingForMotion || self.waitingForNotification {
+            if self.waitingForMotion || self.waitingForNotification {
                 self.showWhenReady()
             } else {
                 // call other methods that need to wait before show
@@ -1128,13 +1134,13 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
         detectAndCallback()
     }
     
-    // MARK: Bluetooth delegate
-    
-    public func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
-        waitingForBluetooth = false
-        detectAndCallback()
-    }
-    
+//    // MARK: Bluetooth delegate
+//
+//    public func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
+//        waitingForBluetooth = false
+//        detectAndCallback()
+//    }
+
     // MARK: - UI Helpers
     
     /**
@@ -1260,8 +1266,8 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
             permissionStatus = statusReminders()
         case .events:
             permissionStatus = statusEvents()
-        case .bluetooth:
-            permissionStatus = statusBluetooth()
+//        case .bluetooth:
+//            permissionStatus = statusBluetooth()
         case .motion:
             permissionStatus = statusMotion()
         }
